@@ -1,0 +1,9 @@
+*.env
+!example.env
+config.yml
+*.pyc
+~*
+*.swp
+.vscode/
+.idea/
+oldbot.py

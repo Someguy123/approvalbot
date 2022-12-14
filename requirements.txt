@@ -1,0 +1,6 @@
+privex-helpers[cache]
+privex-loghelper
+discord-py-interactions==4.*
+python-dotenv
+PyYAML==6.*
+privex-db

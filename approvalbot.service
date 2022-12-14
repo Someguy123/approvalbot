@@ -1,0 +1,74 @@
+#####
+#
+# Systemd Service file for `someguy123/approval-bot`
+#
+# To use this file, copy it into /etc/systemd/system/approvalbot.service , replace `approvalbot` with the username of the Linux
+# account it was installed into, and adjust the paths if necessary.
+#
+# Once adjusted for your specific installation, run the following:
+#
+#    systemctl enable approvalbot.service
+#    systemctl start approvalbot.service
+#
+# approvalbot will now have started in the background as a systemd service, and will automatically start on reboot
+#
+#####
+[Unit]
+Description=ApprovalBot - Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+User=approvalbot
+
+WorkingDirectory=/home/approvalbot/approvalbot/
+EnvironmentFile=/home/approvalbot/approvalbot/.env
+
+ExecStart=/home/approvalbot/approvalbot/run.sh bot
+
+Restart=always
+Environment=PYTHONUNBUFFERED=0
+RestartSec=30
+StandardOutput=syslog
+
+# Hardening measures
+####################
+
+# Provide a private /tmp and /var/tmp.
+PrivateTmp=true
+
+# Mount /usr, /boot/ and /etc read-only for the process.
+ProtectSystem=full
+
+# Disallow the process and all of its children to gain
+# new privileges through execve().
+NoNewPrivileges=true
+
+# Use a new /dev namespace only populated with API pseudo devices
+# such as /dev/null, /dev/zero and /dev/random.
+PrivateDevices=true
+
+# Deny the creation of writable and executable memory mappings.
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target
+Alias=approval-bot.service
+
+#####
+# +===================================================+
+# |                 © 2022 Someguy123                 |
+# |               https://github.com/Someguy123       |
+# +===================================================+
+# |                                                   |
+# |        Approval Bot for Discord                   |
+# |        License: GNU AGPL v3                       |
+# |                                                   |
+# |        https://github.com/Someguy123/approvalbot  |
+# |                                                   |
+# |        Core Developer(s):                         |
+# |                                                   |
+# |          (+)  Chris (@someguy123)                 |
+# |                                                   |
+# +===================================================+
+#####
