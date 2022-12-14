@@ -298,7 +298,7 @@ class Approval(DictDataClass):
     raw_data: Union[dict, DictObject] = field(default_factory=DictObject)
     
     _UPDATE_FIELDS: Tuple[str, ...] = (
-        'approvals', 'disapprovals', 'approved_by', 'disapproved_by', 'outcome', 'total_all_mods'
+        'message_id', 'approvals', 'disapprovals', 'approved_by', 'disapproved_by', 'outcome', 'total_all_mods'
     )
 
     def fix_fields(self):
@@ -347,14 +347,17 @@ class Approval(DictDataClass):
         o = await adb.find_approval_msgid(self.message_id)
         self.fix_fields()
         if empty(o):
-            create_data = await adb.create(
-                self.message_id, self.action, self.url, self.reason, self.username, self.approvals,
-                self.disapprovals, self.approved_by, self.disapproved_by, total_all_mods=self.total_all_mods,
-                outcome=self.outcome, end_time=self.end_time
-            )
-            self.id = create_data['row_id']
-            # o = await adb.find_approval_msgid(self.message_id)
-            # self.id = o['id']
+            if not empty(self.id):
+                await self.update()
+            else:
+                create_data = await adb.create(
+                    self.message_id, self.action, self.url, self.reason, self.username, self.approvals,
+                    self.disapprovals, self.approved_by, self.disapproved_by, total_all_mods=self.total_all_mods,
+                    outcome=self.outcome, end_time=self.end_time
+                )
+                self.id = create_data['row_id']
+                # o = await adb.find_approval_msgid(self.message_id)
+                # self.id = o['id']
         else:
             await self.update()
         return self.id

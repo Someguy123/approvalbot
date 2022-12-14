@@ -280,13 +280,14 @@ def has_majority(obj_approvals: Union[MessageStore, Approval, dict, int], disapp
 
     
 async def handle_majority(m: Approval, ctx: Union[CommandContext, ComponentContext]):
+    log.debug(f"Handling majority - {m.approvals=} {m.disapprovals} majority_number={get_majority_number()}")
     # if m.approvals > m.disapprovals and m.approvals >  (int(dec_round(Decimal(len(CONFIG.moderators)) / 2, rounding=ROUND_UP))):
     if m.approvals > m.disapprovals and m.approvals >= get_majority_number():
-        await ctx.send(f":green_circle: :green_circle: :green_circle: The poll for post/user/action '<{m.post}>' has reached majority moderator **approval**! The action may now be taken :)")
+        await ctx.send(f":green_circle: :green_circle: :green_circle: The poll for post/user/action '<{m.url}>' has reached majority moderator **approval**! The action may now be taken :)")
         
     # if m.disapprovals > m.approvals and m.disapprovals > (int(dec_round(Decimal(len(CONFIG.moderators)) / 2, rounding=ROUND_UP))):
     if m.disapprovals > m.approvals and m.disapprovals >= get_majority_number():
-        await ctx.send(f":red_circle: :red_circle: :red_circle: The poll for post/user/action '<{m.post}>' has reached majority moderator **DIS-approval**! The action should not be taken")
+        await ctx.send(f":red_circle: :red_circle: :red_circle: The poll for post/user/action '<{m.url}>' has reached majority moderator **DIS-approval**! The action should not be taken")
         
 
 
