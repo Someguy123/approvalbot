@@ -568,7 +568,7 @@ async def show_votes(ctx: interactions.CommandContext, enable: bool):
 
     if not await is_admin(ctx):
         log.debug("Non-administrator %s called /show_votes - letting them know this isn't allowed and aborting the command...", call_user)
-        await ctx.send("ERROR: Only server administrators can remove moderators from the bot!", ephemeral=True)
+        await ctx.send("ERROR: Only server administrators can set show_votes on the bot!", ephemeral=True)
         return
     
     if enable:
@@ -580,6 +580,57 @@ async def show_votes(ctx: interactions.CommandContext, enable: bool):
     
     save_config()
 
+@bot.command(scope=SERVER_IDS, description="Enable or disable allowing admins who aren't moderators to vote")
+@interactions.option("Do we allow admins to vote if they're not also moderators?")
+async def admins_can_vote(ctx: interactions.CommandContext, enable: bool):
+    call_user = f"{ctx.user.username}#{ctx.user.discriminator}"
+
+    if not await is_admin(ctx):
+        log.debug("Non-administrator %s called /admins_can_vote - letting them know this isn't allowed and aborting the command...", call_user)
+        await ctx.send("ERROR: Only server administrators can remove moderators from the bot!", ephemeral=True)
+        return
+    
+    if enable:
+        CONFIG.admins_can_vote = True
+        await ctx.send(" :green_circle: Admin voting has been enabled")
+    else:
+        CONFIG.admins_can_vote = False
+        await ctx.send(" :red_circle: Admin voting has been disable")
+    
+    save_config()
+
+@bot.command(scope=SERVER_IDS, description="Enable or disable including non-moderator admins in the majority count needed")
+@interactions.option("Do we include non-moderator admins in the majority count needed?")
+async def majority_include_admins(ctx: interactions.CommandContext, enable: bool):
+    call_user = f"{ctx.user.username}#{ctx.user.discriminator}"
+
+    if not await is_admin(ctx):
+        log.debug("Non-administrator %s called /majority_include_admins - letting them know this isn't allowed and aborting the command...", call_user)
+        await ctx.send("ERROR: Only server administrators can set majority_include_admins on the bot!", ephemeral=True)
+        return
+    
+    if enable:
+        CONFIG.majority_include_admins = True
+        await ctx.send(" :green_circle: Admin voting has been enabled")
+    else:
+        CONFIG.majority_include_admins = False
+        await ctx.send(" :red_circle: Admin voting has been disable")
+    
+    save_config()
+
+@bot.command(scope=SERVER_IDS, description="Send a message displaying the current configuration settings")
+async def list_settings(ctx: interactions.CommandContext):
+    call_user = f"{ctx.user.username}#{ctx.user.discriminator}"
+
+    if not await is_admin(ctx):
+        log.debug("Non-administrator %s called /list_settings - letting them know this isn't allowed and aborting the command...", call_user)
+        await ctx.send("ERROR: Only server administrators can list settings on the bot!", ephemeral=True)
+        return
+    
+    msg = "**_Bot Settings_**\n"
+    for k, v in CONFIG.items():
+        msg += f"**{k}:**\t\t{v}\n"
+    await ctx.send(msg)
 
 if __name__ == '__main__':
     bot.start()

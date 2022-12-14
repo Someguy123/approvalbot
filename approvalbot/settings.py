@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from typing import List, Union, Optional
 from privex.helpers import env_bool, env_csv, env_int, DictObject
+from privex.helpers import settings as pvx_settings
 from privex.loghelper import LogHelper
 from os import getenv as env
 from os.path import dirname, abspath
@@ -60,6 +61,11 @@ DATA_DIR: Path = Path(env('DATA_DIR', BASE_DIR / 'data')).resolve()
 APPROVAL_DB: Path = Path(env('APPROVAL_DB', DATA_DIR / 'approvals.sqlite3'))
 """Where to store the Approvals DB? Defaults to: DATA_DIR/approvals.sqlite3 (data/approvals.sqlite3)"""
 
+APPROVAL_DB = APPROVAL_DB.resolve()
+
+pvx_settings.SQLITE_APP_DB_FOLDER = env('SQLITE_APP_DB_FOLDER', str(DATA_DIR))
+pvx_settings.SQLITE_APP_DB_NAME = env('SQLITE_APP_DB_NAME', 'cache_approvalbot')
+
 CONFIG_DEFAULTS = DictObject(
     moderators=[], admins=[], show_votes=False,
     admins_can_vote=True, majority_include_admins=True
@@ -69,12 +75,12 @@ CONFIG = DictObject(**CONFIG_DEFAULTS)
 if not CONFIG_FILE.is_absolute():
     CONFIG_FILE = BASE_DIR / CONFIG_FILE
 
-if not DATA_DIR.exists():
-    log.debug("Data dir doesn't exist, creating DATA_DIR folder: %s", DATA_DIR)
-    os.mkdir(DATA_DIR)
-
 if not APPROVAL_DB.is_absolute():
     if APPROVAL_DB.startswith(DATA_DIR.name) or APPROVAL_DB.startswith('./' + DATA_DIR.name):
         APPROVAL_DB = APPROVAL_DB.name
     APPROVAL_DB =  DATA_DIR / APPROVAL_DB
+
+if not Path(pvx_settings.SQLITE_APP_DB_FOLDER).exists():
+    log.debug("Sqlite DB dir doesn't exist, creating SQLITE_APP_DB_FOLDER folder: %s", pvx_settings.SQLITE_APP_DB_FOLDER)
+    os.mkdir(pvx_settings.SQLITE_APP_DB_FOLDER)
 
