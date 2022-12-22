@@ -26,7 +26,7 @@ import math
 from typing import Union
 from privex.helpers import dec_round, empty, empty_if, DictObject
 from approvalbot.core import load_config, save_config
-from approvalbot.objects import MessageStore, ApprovalsDB, auto_relative, default_endtime, ApprovalOutcome, Approval, get_relative_seconds, now_plus_minutes
+from approvalbot.objects import MessageStore, ApprovalsDB, auto_relative, default_endtime, ApprovalOutcome, Approval, get_relative_seconds, now_plus_minutes, datetime_to_unix
 from approvalbot import settings
 from approvalbot.settings import CONFIG, SERVER_IDS, TOKEN, VERSION, GH_URL
 import interactions
@@ -64,8 +64,11 @@ async def get_version(ctx: Union[CommandContext, ComponentContext]):
 
 
 def template_approve(action: str, post: str, reason:str, sender: str = "", approvals: int = 0, disapprovals: int = 0, expires_at: datetime = None, db_id=None) -> interactions.Embed:
-    time_left = auto_relative(datetime.utcnow(), expires_at)
+    # time_left = auto_relative(datetime.utcnow(), expires_at)
     relsecs = get_relative_seconds(datetime.utcnow(), expires_at)
+    expires_at_unix = datetime_to_unix(expires_at)
+    expires_at_dsc = f"<t:{expires_at_unix}:f>"
+    time_left = f"<t:{expires_at_unix}:R>"
     if relsecs < 0:
         time_left = "ENDED"
     
@@ -90,7 +93,7 @@ def template_approve(action: str, post: str, reason:str, sender: str = "", appro
                 interactions.EmbedField(name="Desired Action", value=f"{action}"),
                 interactions.EmbedField(name="Post", value=f"{post}"),
                 interactions.EmbedField(name="Reason for Action", value=f"{reason}"),
-                interactions.EmbedField(name="Voting ends at:", value=f"{'n/a' if expires_at is None else expires_at.isoformat() + ' UTC-0'}"),
+                interactions.EmbedField(name="Voting ends at:", value=f"{'n/a' if expires_at is None else expires_at_dsc}"),
                 interactions.EmbedField(name="Time left (updated after each vote):", value=time_left),
             ],
             # footer=interactions.EmbedFooter(
