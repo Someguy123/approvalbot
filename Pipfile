@@ -10,6 +10,7 @@ discord-py-interactions = "*"
 python-dotenv = "*"
 pyyaml = "*"
 privex-db = "*"
+aioredis = "==1.*"
 
 [dev-packages]
 pylint = "*"
